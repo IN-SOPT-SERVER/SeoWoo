@@ -8,7 +8,7 @@ interface MEMBER {
   age: number;
   address: string;
   favorite: string;
-  mbti?: string;
+  mbti: string;
 }
 
 const members: MEMBER[] = [
