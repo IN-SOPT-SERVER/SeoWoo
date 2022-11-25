@@ -7,5 +7,6 @@ router.use("/blog", require("./blog"));
 router.use("/comment", require("./comment"));
 router.use("/movie", require("./movie"));
 router.use("/members", require("./members"));
+router.use("")
 
 module.exports = router; // 모듈로 반환
