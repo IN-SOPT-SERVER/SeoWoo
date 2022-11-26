@@ -13,11 +13,11 @@ const getUserById = async (req: Request, res: Response) => {
   const { userId } = req.params;
 
   const data = await userService.getUserById(+userId);
-
   if (!data) {
-    return res.status(404).json({ status: 404, message: "NOT_FOUND" });
+    return res.status(sc.NOT_FOUND).send(fail(sc.NOT_FOUND, rm.NOT_FOUND));
   }
-  return res.status(200).json({ status: 200, message: "유저 조회 성공", data });
+
+  return res.status(sc.OK).send(success(sc.OK, rm.READ_USER_SUCCESS, data));
 };
 
 //* 유저 생성
@@ -56,24 +56,25 @@ const createUser = async (req: Request, res: Response) => {
 
 //* 유저 전체 조회
 const getAllUser = async (req: Request, res: Response) => {
-  const data = await userService.getAllUser();
+  const { page, limit } = req.query;
+  const data = await userService.getAllUser(Number(page), Number(limit));
 
   return res
-    .status(200)
-    .json({ status: 200, message: "유저 전체 조회 성공 ", data });
+    .status(sc.OK)
+    .send(success(sc.OK, rm.READ_ALL_USERS_SUCCESS, data));
 };
 
 //* 유저 정보 업데이트
 const updateUser = async (req: Request, res: Response) => {
   const { name } = req.body;
   const { userId } = req.params;
-  if (!name)
-    return res.status(400).json({ status: 400, message: "유저 업데이트 실패" });
-
+  if (!name) {
+    return res
+      .status(sc.BAD_REQUEST)
+      .send(fail(sc.BAD_REQUEST, rm.BAD_REQUEST));
+  }
   const data = await userService.updateUser(+userId, name);
-  return res
-    .status(200)
-    .json({ status: 200, message: "유저 업데이트 성공", data });
+  return res.status(sc.OK).send(success(sc.OK, rm.UPDATE_USER_SUCCESS, data));
 };
 
 //* 유저 삭제
@@ -81,7 +82,7 @@ const deleteUser = async (req: Request, res: Response) => {
   const { userId } = req.params;
 
   await userService.deleteUser(+userId);
-  return res.status(200).json({ status: 200, message: "유저 삭제 성공" });
+  return res.status(sc.OK).send(success(sc.OK, rm.DELETE_USER_SUCCESS));
 };
 
 //* 로그인
@@ -122,6 +123,24 @@ const signInUser = async (req: Request, res: Response) => {
   }
 };
 
+//* GET ~/api/user?keyword=서우
+const searchUserByUserName = async (req: Request, res: Response) => {
+  const { keyword, option } = req.query;
+
+  const data = await userService.searchUserByName(
+    keyword as string,
+    option as string
+  );
+
+  if (!data) {
+    return res
+      .status(sc.BAD_REQUEST)
+      .send(fail(sc.BAD_REQUEST, rm.SEARCH_USER_FAIL));
+  }
+
+  return res.status(sc.OK).send(success(sc.OK, rm.SEARCH_USER_SUCCESS, data));
+};
+
 const userController = {
   getUserById,
   createUser,
@@ -129,6 +148,7 @@ const userController = {
   updateUser,
   deleteUser,
   signInUser,
+  searchUserByUserName,
 };
 
 export default userController;

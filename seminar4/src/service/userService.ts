@@ -24,10 +24,10 @@ const createUser = async (userCreateDto: UserCreateDTO) => {
 
   const data = await prisma.user.create({
     data: {
-      userName: userCreateDto?.name,
+      userName: userCreateDto?.userName,
       age: userCreateDto?.age,
-      email: userCreateDto.email,
-      password,
+      email: userCreateDto?.email,
+      password: password,
     },
   });
 
@@ -35,8 +35,11 @@ const createUser = async (userCreateDto: UserCreateDTO) => {
 };
 
 //* 유저 전체 조회
-const getAllUser = async () => {
-  const data = await prisma.user.findMany();
+const getAllUser = async (page: number, limit: number) => {
+  const data = await prisma.user.findMany({
+    skip: (page - 1) * limit,
+    take: limit,
+  });
   return data;
 };
 //* 유저 정보 업데이트
@@ -82,6 +85,54 @@ const signIn = async (userSignInDto: UserSignInDTO) => {
   }
 };
 
+const searchUserByName = async (keyword: string, option: string) => {
+  //? 유저 최신순
+  if (option === "desc") {
+    const data = await prisma.user.findMany({
+      where: {
+        userName: {
+          contains: keyword,
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return data;
+  }
+
+  //? 유저 오래된 순
+  if (option === "asc") {
+    const data = await prisma.user.findMany({
+      where: {
+        userName: {
+          contains: keyword,
+        },
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
+    });
+    return data;
+  }
+
+  //? 유저 이름 순
+  if (option === "nameDesc") {
+    const data = await prisma.user.findMany({
+      where: {
+        userName: {
+          contains: keyword,
+        },
+      },
+      orderBy: {
+        userName: "asc",
+      },
+    });
+    return data;
+  }
+};
+
 const userService = {
   getUserById,
   createUser,
@@ -89,6 +140,7 @@ const userService = {
   updateUser,
   deleteUser,
   signIn,
+  searchUserByName,
 };
 
 export default userService;

@@ -5,11 +5,14 @@ import { auth } from "../middlewares";
 
 const router: Router = Router();
 
+//* 이름으로 유저 검색 - GET api/user?keyword={}
+router.get("/search", userController.searchUserByUserName);
+
 //* 유저 생성 - POST api/user
 router.post(
   "/",
   [
-    body("name").notEmpty(),
+    body("userName").notEmpty(),
     body("email").notEmpty(),
     body("password").isLength({ min: 6 }),
   ],

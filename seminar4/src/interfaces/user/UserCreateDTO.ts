@@ -1,5 +1,5 @@
 export interface UserCreateDTO {
-  name: string;
+  userName: string;
   age: number;
   email: string;
   password: string;
